@@ -1,17 +1,22 @@
-NAME	= philo
+NAME = philo
 
-SRC	= philo.c tools.c tools1.c supervisor.c
+SRC = philo.c tools.c tools1.c supervisor.c
 
-CC = gcc
+OBJ = $(SRC:.c=.o)
 
-CFLAGS = -Wall -Wextra -Werror -pthread #-g -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -pthread
 
-$(NAME) :
-	$(CC) $(CFLAGS) $(SRC) -o $(NAME)
+all: $(NAME)
 
-all	: $(NAME)
-clean :
+$(NAME): $(OBJ)
+	@cc $(CFLAGS) $(OBJ) -o $(NAME)
+	@echo "✅🤖✅"
+
+clean:
+	@rm -rf $(OBJ)
+
+fclean: clean
 	@rm -rf $(NAME)
-fclean : clean
-	@rm -rf $(NAME)
-re : clean fclean all
+	@echo "🚮🚮🚮"
+
+re: fclean all

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tools.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nloutfi <nloutfi@student.1337.ma>          +#+  +:+       +#+        */
+/*   By: nloutfi <nloutfi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 23:44:48 by nloutfi           #+#    #+#             */
-/*   Updated: 2022/11/29 17:19:36 by nloutfi          ###   ########.fr       */
+/*   Updated: 2022/11/29 21:41:25 by nloutfi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,9 @@ void	*ph_routine(void *p)
 		ft_print(ph, "has taken a fork");
 		pthread_mutex_lock(ph->next_fork);
 		ft_print(ph, "has taken a fork");
-		pthread_mutex_lock(&ph->is_eating);
+		ft_eat(ph);
 		ph->meals_num++;
 		ft_must_eat(ph);
-		pthread_mutex_unlock(&ph->is_eating);
 		pthread_mutex_unlock(ph->next_fork);
 		pthread_mutex_unlock(&ph->fork);
 		ft_print(ph, "is sleeping");
