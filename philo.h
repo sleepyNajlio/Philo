@@ -6,7 +6,7 @@
 /*   By: nloutfi <nloutfi@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 23:16:38 by nloutfi           #+#    #+#             */
-/*   Updated: 2022/11/29 03:46:29 by nloutfi          ###   ########.fr       */
+/*   Updated: 2022/11/29 16:24:13 by nloutfi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,40 +19,38 @@
 # include <sys/time.h>
 # include <unistd.h>
 
-typedef struct s_all
+typedef struct s_data
 {
-	int				nb_p;
-	int				tt_d;
-	int				tt_e;
-	int				tt_s;
-	int				e_t;
-	int				check;
-	int				flag;
-	long			simul;
-	pthread_mutex_t	check_eat;
-	pthread_mutex_t	r_flag;
-	pthread_mutex_t	printing;
-}	t_all;
-
-typedef int	t_index;
+	int				num_of_philos;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				must_eat;
+	int				e_target;
+	int				is_dead;
+	long			start_time;
+	pthread_mutex_t	print;
+	pthread_mutex_t	check_target;
+	pthread_mutex_t	death_flag;
+}	t_data;
 
 typedef struct s_philo
 {
 	pthread_t		philo;
-	long			l_e;
-	int				n_e;
-	int				index;
-	pthread_mutex_t	read_meals;
+	t_data			*data;
+	int				id;
+	long			last_eat;
+	int				meals_num;
 	pthread_mutex_t	fork;
-	pthread_mutex_t	*nxt_fork;
-	t_all			*all;
+	pthread_mutex_t	*next_fork;
+	pthread_mutex_t	is_eating;
 }	t_philo;
 
 long	ft_get_time(void);
 int		ft_atoi(char *str);
-int		ft_creat(t_philo *philos, int i);
-void	ft_supervisor(t_philo *philos);
-void	ft_sleep(long time);
-void	ft_print_philo(t_philo *philos, char *str);
+int		ft_create(t_philo *ph, int i);
+void	ft_supervisor(t_philo *ph);
+void	ft_usleep(long time);
+void	ft_print(t_philo *ph, char *str);
 
 #endif

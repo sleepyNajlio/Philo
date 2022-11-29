@@ -6,58 +6,58 @@
 /*   By: nloutfi <nloutfi@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 03:29:24 by nloutfi           #+#    #+#             */
-/*   Updated: 2022/11/29 03:30:54 by nloutfi          ###   ########.fr       */
+/*   Updated: 2022/11/29 17:08:24 by nloutfi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	ft_check_meals(t_philo *philos, t_index i)
+int	check_meals(t_philo *ph, int i)
 {
-	pthread_mutex_lock(&philos[i].all->check_eat);
-	if (philos->all->check == philos->all->nb_p)
+	pthread_mutex_lock(&ph[i].data->check_target);
+	if (ph->data->e_target == ph->data->num_of_philos)
 	{
-		pthread_mutex_lock(&philos->all->r_flag);
-		philos->all->flag = 0;
-		pthread_mutex_unlock(&philos->all->r_flag);
+		pthread_mutex_lock(&ph->data->death_flag);
+		ph->data->is_dead = 0;
+		pthread_mutex_unlock(&ph->data->death_flag);
 		return (1);
 	}
-	pthread_mutex_unlock(&philos[i].all->check_eat);
+	pthread_mutex_unlock(&ph[i].data->check_target);
 	return (0);
 }
 
-int	ft_ch_flag(t_philo *philos, t_index i)
+int	check_death(t_philo *ph, int i)
 {
-	if (ft_get_time() - philos[i].l_e >= philos[i].all->tt_d)
+	if (ft_get_time() - ph[i].last_eat >= ph[i].data->time_to_die)
 	{
-		pthread_mutex_lock(&philos->all->r_flag);
-		philos->all->flag = 0;
-		pthread_mutex_unlock(&philos->all->r_flag);
-		printf("%ld %d died\n", ft_get_time() - philos->all->simul, \
-			philos->index);
+		pthread_mutex_lock(&ph->data->death_flag);
+		ph->data->is_dead = 0;
+		pthread_mutex_unlock(&ph->data->death_flag);
+		printf("%ld %d died\n", ft_get_time() - ph->data->start_time, \
+			ph->id);
 		return (1);
 	}
 	return (0);
 }
 
-void	ft_supervisor(t_philo *philos)
+void	ft_supervisor(t_philo *ph)
 {
-	t_index	i;
+	int	i;
 
 	while (1)
 	{
 		i = 0;
-		while (i < philos->all->nb_p)
+		while (i < ph->data->num_of_philos)
 		{
-			pthread_mutex_lock(&philos->all->printing);
-			if (philos->all->e_t != -1 \
-				&& ft_check_meals(philos, i) == EXIT_FAILURE)
+			pthread_mutex_lock(&ph->data->print);
+			if (ph->data->must_eat != -1 \
+				&& check_meals(ph, i))
 				return ;
-			pthread_mutex_lock(&philos[i].read_meals);
-			if (ft_ch_flag(philos, i) == EXIT_FAILURE)
+			pthread_mutex_lock(&ph[i].is_eating);
+			if (check_death(ph, i))
 				return ;
-			pthread_mutex_unlock(&philos->all->printing);
-			pthread_mutex_unlock(&philos[i].read_meals);
+			pthread_mutex_unlock(&ph->data->print);
+			pthread_mutex_unlock(&ph[i].is_eating);
 			i++;
 		}
 		usleep(50);

@@ -6,80 +6,76 @@
 /*   By: nloutfi <nloutfi@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 23:44:48 by nloutfi           #+#    #+#             */
-/*   Updated: 2022/11/29 03:23:26 by nloutfi          ###   ########.fr       */
+/*   Updated: 2022/11/29 17:19:36 by nloutfi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long	ft_get_time(void)
+int	is_dead(t_philo *ph)
 {
-	struct timeval	curr;
-
-	gettimeofday(&curr, NULL);
-	return ((curr.tv_sec * 1000) + (curr.tv_usec / 1000));
-}
-
-int	ft_check_flag(t_philo *philos)
-{
-	pthread_mutex_lock(&philos->all->r_flag);
-	if (philos->all->flag == 0)
+	pthread_mutex_lock(&ph->data->death_flag);
+	if (ph->data->is_dead == 0)
 	{
-		pthread_mutex_unlock(&philos->all->r_flag);
+		pthread_mutex_unlock(&ph->data->death_flag);
 		return (0);
 	}
-	pthread_mutex_unlock(&philos->all->r_flag);
+	pthread_mutex_unlock(&ph->data->death_flag);
 	return (1);
 }
 
-void	ft_must_eat(t_philo *philos)
+void	ft_must_eat(t_philo *ph)
 {
-	if (philos->n_e == philos->all->e_t && philos->all->e_t != -1)
+	if (ph->meals_num == ph->data->must_eat && ph->data->must_eat != -1)
 	{
-		pthread_mutex_lock(&philos->all->check_eat);
-		philos->all->check++;
-		pthread_mutex_unlock(&philos->all->check_eat);
+		pthread_mutex_lock(&ph->data->check_target);
+		ph->data->e_target++;
+		pthread_mutex_unlock(&ph->data->check_target);
 	}
 }
 
-void	*routine(void *p)
+void	ft_eat(t_philo *ph)
 {
-	t_philo	*philos;
+	ft_print(ph, "is eating");
+	pthread_mutex_lock(&ph->is_eating);
+	ph->last_eat = ft_get_time();
+	pthread_mutex_unlock(&ph->is_eating);
+	ft_usleep(ph->data->time_to_eat);
+}
 
-	philos = (t_philo *)p;
-	if (philos->index % 2 == 0)
-		ft_sleep(philos->all->tt_e / 10);
-	while (ft_check_flag(philos))
+void	*ph_routine(void *p)
+{
+	t_philo	*ph;
+
+	ph = (t_philo *)p;
+	if (ph->id % 2 == 0)
+		ft_usleep(ph->data->time_to_eat / 10);
+	while (is_dead(ph))
 	{
-		pthread_mutex_lock(&philos->fork);
-		ft_print_philo(philos, "has taken a fork");
-		pthread_mutex_lock(philos->nxt_fork);
-		ft_print_philo(philos, "has taken a fork");
-		ft_print_philo(philos, "is eating");
-		pthread_mutex_lock(&philos->read_meals);
-		philos->l_e = ft_get_time();
-		pthread_mutex_unlock(&philos->read_meals);
-		ft_sleep(philos->all->tt_e);
-		pthread_mutex_lock(&philos->read_meals);
-		philos->n_e++;
-		ft_must_eat(philos);
-		pthread_mutex_unlock(&philos->read_meals);
-		pthread_mutex_unlock(philos->nxt_fork);
-		pthread_mutex_unlock(&philos->fork);
-		ft_print_philo(philos, "is sleeping");
-		ft_sleep(philos->all->tt_s);
-		ft_print_philo(philos, "is thinking");
+		pthread_mutex_lock(&ph->fork);
+		ft_print(ph, "has taken a fork");
+		pthread_mutex_lock(ph->next_fork);
+		ft_print(ph, "has taken a fork");
+		pthread_mutex_lock(&ph->is_eating);
+		ph->meals_num++;
+		ft_must_eat(ph);
+		pthread_mutex_unlock(&ph->is_eating);
+		pthread_mutex_unlock(ph->next_fork);
+		pthread_mutex_unlock(&ph->fork);
+		ft_print(ph, "is sleeping");
+		ft_usleep(ph->data->time_to_sleep);
+		ft_print(ph, "is thinking");
 	}
 	return (0);
 }
 
-int	ft_creat(t_philo *philos, int i)
+int	ft_create(t_philo *ph, int i)
 {
-	while (++i < philos->all->nb_p)
+	while (++i < ph->data->num_of_philos)
 	{
-		if (pthread_create(&philos[i].philo, NULL, routine, &philos[i]) != 0)
+		if (pthread_create(&ph[i].philo, NULL, ph_routine, &ph[i]) != 0)
 			return (1);
-		if (pthread_detach(philos[i].philo) != 0)
+		if (pthread_detach(ph[i].philo) != 0)
 			return (1);
 	}
 	return (0);
