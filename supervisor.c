@@ -1,28 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils2.c                                           :+:      :+:    :+:   */
+/*   supervisor.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nloutfi <nloutfi@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/10 17:54:31 by yobenali          #+#    #+#             */
-/*   Updated: 2022/11/29 02:15:55 by nloutfi          ###   ########.fr       */
+/*   Created: 2022/11/29 03:29:24 by nloutfi           #+#    #+#             */
+/*   Updated: 2022/11/29 03:30:54 by nloutfi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
-
-int	ft_creat(t_philo *philos, int i)
-{
-	while (++i < philos->all->nb_p)
-	{
-		if (pthread_create(&philos[i].philo, NULL, routine, &philos[i]) != 0)
-			return (1);
-		if (pthread_detach(philos[i].philo) != 0)
-			return (1);
-	}
-	return (0);
-}
+#include "philo.h"
 
 int	ft_check_meals(t_philo *philos, t_index i)
 {

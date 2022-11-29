@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nloutfi <nloutfi@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/25 19:29:09 by yobenali          #+#    #+#             */
-/*   Updated: 2022/11/29 02:15:35 by nloutfi          ###   ########.fr       */
+/*   Created: 2022/11/29 03:00:51 by nloutfi           #+#    #+#             */
+/*   Updated: 2022/11/29 03:06:06 by nloutfi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "philo.h"
 
 void	ft_init_philo(t_philo *philos, t_all *init, int i)
 {
@@ -25,47 +25,6 @@ void	ft_init_philo(t_philo *philos, t_all *init, int i)
 		philos[i].nxt_fork = &philos[(i + 1) % init->nb_p].fork;
 		philos[i].all = init;
 	}
-}
-
-void	ft_must_eat(t_philo *philos)
-{
-	if (philos->n_e == philos->all->e_t && philos->all->e_t != -1)
-	{
-		pthread_mutex_lock(&philos->all->check_eat);
-		philos->all->check++;
-		pthread_mutex_unlock(&philos->all->check_eat);
-	}
-}
-
-void	*routine(void *p)
-{
-	t_philo	*philos;
-
-	philos = (t_philo *)p;
-	if (philos->index % 2 == 0)
-		ft_sleep(philos->all->tt_e / 10);
-	while (ft_check_flag(philos))
-	{
-		pthread_mutex_lock(&philos->fork);
-		ft_print_philo(philos, "has taken a fork");
-		pthread_mutex_lock(philos->nxt_fork);
-		ft_print_philo(philos, "has taken a fork");
-		ft_print_philo(philos, "is eating");
-		pthread_mutex_lock(&philos->read_meals);
-		philos->l_e = ft_get_time();
-		pthread_mutex_unlock(&philos->read_meals);
-		ft_sleep(philos->all->tt_e);
-		pthread_mutex_lock(&philos->read_meals);
-		philos->n_e++;
-		ft_must_eat(philos);
-		pthread_mutex_unlock(&philos->read_meals);
-		pthread_mutex_unlock(philos->nxt_fork);
-		pthread_mutex_unlock(&philos->fork);
-		ft_print_philo(philos, "is sleeping");
-		ft_sleep(philos->all->tt_s);
-		ft_print_philo(philos, "is thinking");
-	}
-	return (0);
 }
 
 int	ft_init_data(int argc, char **argv, t_all *init)

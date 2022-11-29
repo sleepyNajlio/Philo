@@ -1,25 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.h                                     :+:      :+:    :+:   */
+/*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nloutfi <nloutfi@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/25 20:50:36 by yobenali          #+#    #+#             */
-/*   Updated: 2022/11/29 02:16:23 by nloutfi          ###   ########.fr       */
+/*   Created: 2022/11/28 23:16:38 by nloutfi           #+#    #+#             */
+/*   Updated: 2022/11/29 03:46:29 by nloutfi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#ifndef PHILO_H
+# define PHILO_H
 # include <stdio.h>
-# include <unistd.h>
+# include <pthread.h>
 # include <stdlib.h>
 # include <limits.h>
-# include <pthread.h>
 # include <sys/time.h>
-
-typedef int	t_index;
+# include <unistd.h>
 
 typedef struct s_all
 {
@@ -36,6 +34,8 @@ typedef struct s_all
 	pthread_mutex_t	printing;
 }	t_all;
 
+typedef int	t_index;
+
 typedef struct s_philo
 {
 	pthread_t		philo;
@@ -48,14 +48,11 @@ typedef struct s_philo
 	t_all			*all;
 }	t_philo;
 
-int		ft_atoi(char *str);
-int		ft_check_flag(t_philo *philos);
-int		ft_creat(t_philo *philos, int i);
-int		ft_check_meals(t_philo *philos, t_index i);
 long	ft_get_time(void);
-void	*routine(void *p);
-void	ft_sleep(long time);
+int		ft_atoi(char *str);
+int		ft_creat(t_philo *philos, int i);
 void	ft_supervisor(t_philo *philos);
+void	ft_sleep(long time);
 void	ft_print_philo(t_philo *philos, char *str);
 
 #endif
